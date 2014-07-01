@@ -1,0 +1,161 @@
+<html>
+	<head>
+		<meta charset="utf8"/>
+		<title>robot websocket reporter</title>
+		<style>
+			#game_sqare{
+				border:2px solid #009933;
+				width:1024px;
+				height:700px;
+			}
+			#showpad{
+				width:1024px;
+				margin:0px  auto;
+			}
+			#showpad  h1{
+				font-size:30px;
+				text-align:center;
+			}
+		</style>
+
+		
+	</head>
+	<body>
+		<div id="showpad" >
+			<h1>西南交通大学工业中心足球机器人实时跟踪面板{{a}}</h1>
+			<canvas id="game_sqare" width="1024" height="700"></canvas>
+		</div>
+		<script>
+			function paintshape(ctx,robot){
+				//robot sharp
+			      ctx.beginPath();
+			      //Math.atan2(y, x)
+			      ctx.arc(robot.x_teamcolor, robot.y_teamcolor, 40, 0, 2*Math.PI, false);
+			      ctx.closePath();
+			      //ctx.lineWidth = 2;
+			      ctx.fillStyle = 'rgba(0,0,0,0.7)';
+			      ctx.fill();
+			      //ctx.strokeStyle = '#550000';
+			      //ctx.stroke();
+
+				  //robot teamcolor
+			      ctx.beginPath();
+			      ctx.arc(robot.x_teamcolor, robot.y_teamcolor, 10, 0, 2*Math.PI, false);
+			      ctx.closePath();
+			      //ctx.fillStyle = 'rgba(0,0,50,0.9)';
+			      ctx.fillStyle = robot.teamcolor;
+			      ctx.fill();
+			      
+			      ctx.fillText(robot.ip+":"+robot.x_teamcolor+","+robot.y_teamcolor, robot.x_teamcolor, robot.y_teamcolor-70);
+ 				  //robot selfcolor
+			      ctx.beginPath();
+			      ctx.arc(robot.x_selfcolor, robot.y_selfcolor, 6, 0, 2*Math.PI, false);
+			      ctx.closePath();
+			      //ctx.fillStyle = 'rgba(0,0,50,0.9)';
+			      ctx.fillStyle = robot.selfcolor;
+			      ctx.fill();
+			      ctx.fillStyle = 'rgba(0,0,255,0.9)';
+			      ctx.fillText(robot.x_selfcolor+","+robot.y_selfcolor, robot.x_selfcolor, robot.y_selfcolor-40);
+			}
+
+			function  transform_y(ymax,robot){
+				var robot = {teamcolor:"",selfcolor:"",x_teamcolor:0,y_teamcolor:0,x_selfcolor:0,y_selfcolor:0,ip:""};
+				robot.y_teamcolor = ymax-robot.y_teamcolor;
+				robot.y_selfcolor = ymax-robot.y_selfcolor;
+				return robot;
+			}
+			function  transform_ball(ymax,ball){
+				ball.y = ymax-ball.y;
+				return ball;
+			}
+			var robotcount = 4;
+			var msglen = 14;
+			var xmax = 1024;
+			var ymax = 700;
+			var colorsmap = {B:"#0033CC",Y:"#FF9900",W:"#DDD",G:"#006600",N:"#000000",L:"#000000"};	
+			var ipmap = {BW:"192.168.165.161",YW:"192.168.165.163",BG:"192.168.165.162",YG:"192.168.165.164"};	
+			var ball = {x:0,y:0}
+			var robot = {teamcolor:"",selfcolor:"",x_teamcolor:0,y_teamcolor:0,x_selfcolor:0,y_selfcolor:0};
+			var canvas=document.getElementById('game_sqare');
+			var ctx=canvas.getContext('2d');
+		    
+
+		
+			var ws = new WebSocket("ws://192.168.165.152/websocket");
+			ws.onopen = function() {
+			   ws.send("Hello, world");
+			};
+			ws.onmessage = function (evt) {
+			   ctx.clearRect(0,0,1024,700);	
+			   //var background = new Image();
+			   //background.src = "/static/bg.jpg";
+				// Make sure the image is loaded first otherwise nothing will draw.
+				//background.onload = function(){
+				 //   ctx.drawImage(background,0,0);
+			    //}
+				//ball
+			   ball.x = parseInt(evt.data.slice(0,3),16);
+			   ball.y = parseInt(evt.data.slice(3,6),16);
+			   	ctx.fillStyle = "#FF0000";
+			     ctx.fillText(ball.x+","+ball.y, ball.x, ball.y-40);
+			   ball.x = xmax-ball.x;
+			   ball.y = ymax-ball.y;
+			   console.log(ball.x);
+			   console.log(ball.y);
+			   //paint ball
+			      ctx.beginPath();
+			      ctx.arc(ball.x, ball.y, 10, 0, 2*Math.PI, false);
+			      ctx.closePath();
+			      //ctx.fillStyle = 'rgba(0,0,50,0.9)';
+			     ctx.fillStyle = "#FF0000";
+			     ctx.fill();
+			     ctx.fillText(ball.x+","+ball.y, ball.x, ball.y-40);
+			      			  
+			   //ctx.fillStyle = "#FF0000";
+			   //ctx.fillRect(x_ball,y_ball,10,15);
+			   //parse  robot msg info
+				var robotmsg = evt.data.slice(6);
+			   console.log(robotmsg);
+			   for(i=0;i<4;i++){
+				   //console.log("xxx");
+				   teamcolor_str = robotmsg.slice(0+msglen*i,1+msglen*i);
+				   selfcolor_str = robotmsg.slice(1+msglen*i,2+msglen*i);
+				   robot.teamcolor = colorsmap[teamcolor_str];
+				   robot.selfcolor = colorsmap[selfcolor_str];
+				   robot.ip = ipmap[teamcolor_str+selfcolor_str];
+				   //console.log(teamcolor_str+teamcolor_str);
+				   robot.x_teamcolor = parseInt(robotmsg.slice(2+msglen*i,5+msglen*i),16);
+				   robot.y_teamcolor = parseInt(robotmsg.slice(5+msglen*i,8+msglen*i),16);
+				   robot.x_selfcolor = parseInt(robotmsg.slice(8+msglen*i,11+msglen*i),16);	
+				   robot.y_selfcolor = parseInt(robotmsg.slice(11+msglen*i,14+msglen*i),16);
+
+				   
+				   if(robot.x_teamcolor*robot.y_teamcolor*robot.x_selfcolor*robot.y_selfcolor != 0){
+
+					  //transform_x&y
+                      robot.x_teamcolor = xmax-robot.x_teamcolor;
+					  robot.y_teamcolor = ymax-robot.y_teamcolor;
+					  robot.x_selfcolor = xmax-robot.x_selfcolor;
+					  robot.y_selfcolor = ymax-robot.y_selfcolor;
+				
+					   paintshape(ctx,robot);
+				   }
+				   
+				  
+			   }
+	
+			   	   
+
+			   //robot
+			   
+
+		//ctx.fillStyle = "rgb(200,0,0)";
+        //ctx.fillRect (0, 0, 30, 30);
+
+        //ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+        //ctx.fillRect (10, 10, 30, 30);
+
+			};
+			</script>
+	</body>
+	</html>
