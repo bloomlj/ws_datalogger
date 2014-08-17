@@ -36,6 +36,10 @@
 			ws.onmessage = function (evt) {
 			   ctx.clearRect(0,0,1024,700);	
                console.log(evt.data);
+               var nodemsg = evt.data.split("|"); 
+               console.log(nodemsg[0]);
+               console.log(nodemsg[1]);
+               console.log(nodemsg[2]);
 			  
 
 			};

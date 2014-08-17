@@ -34,13 +34,13 @@ class ChatWebSocket(tornado.websocket.WebSocketHandler):
         
 
 settings = {
-    "static_path": os.path.join(os.path.dirname(__file__), "static"),
+    "static_path": os.path.join(os.path.dirname(__file__), "public"),
 }
 
 application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/websocket", ChatWebSocket),
-    (r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
+    (r"/pubic/(.*)", tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
 ], **settings)
 
 

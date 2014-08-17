@@ -7,7 +7,7 @@ import serial
 #import thread
 from websocket import create_connection
 
-ser = serial.Serial(7, 9600, timeout=1)
+ser = serial.Serial(7, 9600, timeout=10)
 
 #web socket for reporter
 

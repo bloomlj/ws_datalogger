@@ -1,3 +1,5 @@
+//xiongmaogu  gps info is 103.598217,30.969961
+
 int analogValue = 0;    // variable to hold the analog value
 
 void setup() {
@@ -10,11 +12,11 @@ void loop() {
   analogValue = analogRead(0);
 
   // print it out in many formats:
-  Serial.print("T:"); 
-  Serial.print("103.123|"); 
-  Serial.print("34.123|"); 
+  Serial.print("T|"); 
+  Serial.print("103.598|"); 
+  Serial.print("30.969|"); 
   Serial.println(analogValue);  // print as an ASCII-encoded decimal
 
   // delay 10 milliseconds before the next reading:
-  delay(10);
+  delay(5000);
 }
