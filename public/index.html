@@ -1,0 +1,48 @@
+<html>
+	<head>
+		<meta charset="utf8"/>
+		<title>robot websocket reporter</title>
+		<style>
+			#game_sqare{
+				border:2px solid #009933;
+				width:1024px;
+				height:700px;
+			}
+			#showpad{
+				width:1024px;
+				margin:0px  auto;
+			}
+			#showpad  h1{
+				font-size:30px;
+				text-align:center;
+			}
+		</style>
+
+		
+	</head>
+	<body>
+		<div id="showpad" >
+			<h1>Sensor Logger Server</h1>
+			<canvas id="livesensor" width="1024" height="700"></canvas>
+		</div>
+		<script>
+			var canvas=document.getElementById('livesensor');
+			var ctx=canvas.getContext('2d');
+		    
+			var ws = new WebSocket("ws://localhost/websocket");
+			ws.onopen = function() {
+			   ws.send("Hello, world");
+			};
+			ws.onmessage = function (evt) {
+			   ctx.clearRect(0,0,1024,700);	
+               console.log(evt.data);
+               var nodemsg = evt.data.split("|"); 
+               console.log(nodemsg[0]);
+               console.log(nodemsg[1]);
+               console.log(nodemsg[2]);
+			  
+
+			};
+			</script>
+	</body>
+	</html>
