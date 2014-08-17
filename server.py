@@ -33,19 +33,6 @@ class ChatWebSocket(tornado.websocket.WebSocketHandler):
         #send_message('A user has left the chat room.')
         
 
-"""def socket_p(q):
-    HOST = '192.168.165.152'                 # Symbolic name meaning all available interfaces
-    PORT = 6000              # Arbitrary non-privileged port
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((HOST, PORT))
-    s.listen(10)
-    while 1:
-        conn, addr = s.accept()
-        udppacket = conn.recv(1024)
-        q.put(udppacket)
-        #print(udppacket)
-    conn.close()
-"""
 settings = {
     "static_path": os.path.join(os.path.dirname(__file__), "static"),
 }
@@ -59,14 +46,10 @@ application = tornado.web.Application([
 
 #udpmsg = ''
 if __name__ == "__main__":
-    #q = Queue()
-    #p = Process(target=socket_p, args=(q,))
-    #p.start()
-    #udpmsg = q.get()
-    
-    #p.join()
-    
+
+    print("Server is running on 80 port now.")
     application.listen(80)
     tornado.ioloop.IOLoop.instance().start()
+    
     
    

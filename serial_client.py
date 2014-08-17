@@ -2,10 +2,12 @@
 # Author:Bloomlj
 # Date:2014/7/1
 
-import math
-import thread
+import serial
+#import math
+#import thread
 from websocket import create_connection
 
+ser = serial.Serial(7, 9600, timeout=1)
 
 #web socket for reporter
 
@@ -19,9 +21,11 @@ def TalkReporter(msg):
 	#print "Received '%s'" % result
 	ws.close()
 
-	
-#read serial
-#message, address = s.recvfrom(BUFSIZE)
-
-#send to server
-TalkReporter(message)     
+while True:
+    #read serial
+    #message, address = s.recvfrom(BUFSIZE)
+    
+    message = ser.readline()
+    #send to server
+    print(message)
+    TalkReporter(message)
